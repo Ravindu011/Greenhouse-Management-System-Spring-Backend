@@ -1,5 +1,6 @@
 package com.project.agroplus.AGROPLUS.ProductController;
 
+import com.project.agroplus.AGROPLUS.PlantService.PlantService;
 import com.project.agroplus.AGROPLUS.ProductModel.ProductModel;
 import com.project.agroplus.AGROPLUS.ProductModel.OnPlantModel;
 import com.project.agroplus.AGROPLUS.ProductRepository.HistoryOnPlantRepo;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -23,6 +25,9 @@ public class ProductController {
 
     @Autowired
     private HistoryOnPlantRepo historyOnPlantRepo;
+
+    @Autowired
+    public PlantService plantService;
 
 
     @PutMapping("/setOngoing/{id}")
@@ -53,30 +58,27 @@ public class ProductController {
         return productRepo.save(newPlant);
     }
 
+    @GetMapping("/viewProduct/{id}")
+    public ResponseEntity<ProductModel> viewProduct(@PathVariable Long id) {
+        Optional<ProductModel> productData = productRepo.findById(id);
+        if (productData.isPresent()) {
+            return new ResponseEntity<>(productData.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
-//    @PutMapping("/removeOn/{id}")
-//    public ResponseEntity<ProductModel> removeOn(@PathVariable Long id) {
-//        Optional<ProductModel> plantData = productRepo.findById(id);
-//        if (plantData.isPresent()) {
-//            ProductModel plant = plantData.get();
-//            plant.setStatus("Ongoing");
-//
-//            // Also add to the ongoing plant table
-//            historyOnPlantRepo.save(new HistoryOnPlantModel(
-//                    plant.getPID(),
-//                    plant.getpName(),
-//                    plant.getTemp(),
-//                    plant.getHumidity(),
-//                    plant.getDaysToGrow(),
-//                    plant.getStatus()
-//            ));
-//            productRepo.save(plant);
-//
-//            return new ResponseEntity<>(plant, HttpStatus.OK);
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
-//    }
+    @GetMapping("/getAllProduct")
+    public List<ProductModel> getAllProduct(){
+        return plantService.findAllPlants();
+
+    }
+
+
+
+
+
+
 
 
 
