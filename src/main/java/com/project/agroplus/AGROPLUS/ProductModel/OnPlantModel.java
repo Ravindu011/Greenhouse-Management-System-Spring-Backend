@@ -5,7 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
 @Entity
-public class ProductModel {
+public class OnPlantModel {
 
     @Id
     @GeneratedValue
@@ -16,6 +16,20 @@ public class ProductModel {
     private int humidity;
     private int daysToGrow;
     private String status;
+
+    // Default constructor
+    public OnPlantModel() {
+    }
+
+    // Parameterized constructor
+    public OnPlantModel(Long pid, String s, int temp, int humidity, int daysToGrow, String status) {
+        this.PID = pid;
+        this.pName = s;
+        this.temp = temp;
+        this.humidity = humidity;
+        this.daysToGrow = daysToGrow;
+        this.status = status;
+    }
 
     public Long getPID() {
         return PID;
