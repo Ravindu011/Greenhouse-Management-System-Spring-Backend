@@ -1,14 +1,12 @@
 package com.project.agroplus.AGROPLUS.ProductModel;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
 @Entity
-public class ProductModel {
+public class HistoryOnPlantModel {
 
     @Id
-    @GeneratedValue
     private Long PID;
 
     private String pName;
@@ -16,6 +14,22 @@ public class ProductModel {
     private int humidity;
     private int daysToGrow;
     private String status;
+
+    // Default constructor
+    public HistoryOnPlantModel() {
+    }
+
+    // Parameterized constructor
+    public HistoryOnPlantModel(Long pid, String s, int temp, int humidity, int daysToGrow, String status) {
+        this.PID = pid;
+        this.pName = s;
+        this.temp = temp;
+        this.humidity = humidity;
+        this.daysToGrow = daysToGrow;
+        this.status = status;
+    }
+
+    // Getters and Setters
 
     public Long getPID() {
         return PID;
