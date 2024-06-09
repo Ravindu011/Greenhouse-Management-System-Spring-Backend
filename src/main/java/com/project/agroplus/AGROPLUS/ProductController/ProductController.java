@@ -71,15 +71,30 @@ public class ProductController {
     @GetMapping("/getAllProduct")
     public List<ProductModel> getAllProduct(){
         return plantService.findAllPlants();
-
     }
 
+    @DeleteMapping("/removePlant/{id}")
+    public ResponseEntity<?> removePlant(@PathVariable Long id) {
+        try {
+            if (productRepo.existsById(id)) {
+                productRepo.deleteById(id);
+                return new ResponseEntity<>(id+" Was Deleted", HttpStatus.OK);
 
 
+            } else {
+                return new ResponseEntity<>("Plant not found", HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            // Log the exception (you can use a logging framework like SLF4J)
+            e.printStackTrace();
+            return new ResponseEntity<>("Internal Server Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-
-
-
+    @PutMapping("/updatePlant/{id}")
+    public ProductModel updateProduct(@PathVariable Long id, @RequestBody ProductModel updatedPlant) {
+        return plantService.updatePlant(id, updatedPlant);
+    }
 
 
 }

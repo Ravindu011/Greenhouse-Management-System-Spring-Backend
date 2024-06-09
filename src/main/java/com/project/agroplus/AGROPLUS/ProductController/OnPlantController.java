@@ -1,7 +1,9 @@
 package com.project.agroplus.AGROPLUS.ProductController;
 
+import com.project.agroplus.AGROPLUS.PlantService.PlantService;
 import com.project.agroplus.AGROPLUS.ProductModel.HistoryOnPlantModel;
 import com.project.agroplus.AGROPLUS.ProductModel.OnPlantModel;
+import com.project.agroplus.AGROPLUS.ProductModel.ProductModel;
 import com.project.agroplus.AGROPLUS.ProductRepository.HistoryOnPlantRepo;
 import com.project.agroplus.AGROPLUS.ProductRepository.OnPlantRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 @RestController
 @CrossOrigin("http://localhost:3000")
@@ -18,6 +21,9 @@ public class OnPlantController {
 
     @Autowired
     private HistoryOnPlantRepo historyOnPlantRepo;
+
+    @Autowired
+    private PlantService plantService;
 
 
     @PutMapping("/moveToHistory/{id}")
@@ -59,6 +65,11 @@ public class OnPlantController {
             e.printStackTrace();
             return new ResponseEntity<>("Internal Server Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/getAllOnProduct")
+    public List<OnPlantModel> getAllOngoing(){
+        return plantService.findOnPlants();
     }
 
 }
