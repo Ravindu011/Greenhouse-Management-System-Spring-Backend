@@ -55,13 +55,10 @@ public class OnPlantController {
             if (onPlantRepo.existsById(id)) {
                 onPlantRepo.deleteById(id);
                 return new ResponseEntity<>(id+" Was Deleted", HttpStatus.OK);
-
-
             } else {
                 return new ResponseEntity<>("Plant not found", HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
-            // Log the exception (you can use a logging framework like SLF4J)
             e.printStackTrace();
             return new ResponseEntity<>("Internal Server Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
