@@ -6,11 +6,8 @@ import jakarta.persistence.Id;
 
 @Entity
 public class OnPlantModel {
-
     @Id
-    @GeneratedValue
     private Long PID;
-
     private String pName;
     private int temp;
     private int humidity;

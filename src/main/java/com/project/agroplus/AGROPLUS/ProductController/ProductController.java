@@ -29,32 +29,80 @@ public class ProductController {
     @Autowired
     public PlantService plantService;
 
+//    @PutMapping("/setOngoing/{id}")
+//    public ResponseEntity<ProductModel> setPlantAsOngoing(@PathVariable Long id) {
+//        Optional<ProductModel> plantData = productRepo.findById(id);
+//        if (plantData.isPresent()) {
+//            ProductModel plant = plantData.get();
+//            plant.setStatus("Ongoing");
+//
+//            // Also add to the ongoing plant table
+//            onPlantRepo.save(new OnPlantModel(
+//                    plant.getPID(),
+//                    plant.getpName(),
+//                    plant.getTemp(),
+//                    plant.getHumidity(),
+//                    plant.getDaysToGrow(),
+//                    plant.getStatus()
+//            ));
+//            productRepo.save(plant);
+//
+//            return new ResponseEntity<>(plant, HttpStatus.OK);
+//        } else {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//    }
 
     @PutMapping("/setOngoing/{id}")
-    public ResponseEntity<ProductModel> setPlantAsOngoing(@PathVariable Long id) {
+    public ResponseEntity<String> setPlantAsOngoing(@PathVariable Long id) {
         Optional<ProductModel> plantData = productRepo.findById(id);
         if (plantData.isPresent()) {
             ProductModel plant = plantData.get();
             plant.setStatus("Ongoing");
 
-            // Also add to the ongoing plant table
-            onPlantRepo.save(new OnPlantModel(
-                    plant.getPID(),
-                    plant.getpName(),
-                    plant.getTemp(),
-                    plant.getHumidity(),
-                    plant.getDaysToGrow(),
-                    plant.getStatus()
-            ));
-            productRepo.save(plant);
+            List<OnPlantModel> ongoingPlants = onPlantRepo.findAll();
 
-            return new ResponseEntity<>(plant, HttpStatus.OK);
+            if (ongoingPlants.isEmpty()) {
+                // Table is empty, add the plant
+                onPlantRepo.save(new OnPlantModel(
+                        plant.getPID(),
+                        plant.getpName(),
+                        plant.getTemp(),
+                        plant.getHumidity(),
+                        plant.getDaysToGrow(),
+                        plant.getStatus()
+                ));
+                productRepo.save(plant);
+                return new ResponseEntity<>("Plant added to ongoing table.", HttpStatus.OK);
+            } else {
+                // Table is not empty, check temperature and humidity of the first plant
+                OnPlantModel firstOngoingPlant = ongoingPlants.get(0);
+                if (firstOngoingPlant.getTemp()==(plant.getTemp()) &&
+                        firstOngoingPlant.getHumidity()==(plant.getHumidity())) {
+                    // Temperatures and humidities are equal, add the plant
+                    onPlantRepo.save(new OnPlantModel(
+                            plant.getPID(),
+                            plant.getpName(),
+                            plant.getTemp(),
+                            plant.getHumidity(),
+                            plant.getDaysToGrow(),
+                            plant.getStatus()
+                    ));
+                    productRepo.save(plant);
+                    return new ResponseEntity<>("Plant added to ongoing table.", HttpStatus.OK);
+                } else {
+                    // Temperatures and humidities are not equal, return error message
+                    return new ResponseEntity<>("Error: Temperature and humidity do not match the ongoing plant conditions.", HttpStatus.CONFLICT);
+                }
+            }
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Error: Plant not found.", HttpStatus.NOT_FOUND);
         }
     }
+
+
     @PostMapping("/addNewPlant")
-    ProductModel addNewPlant(@RequestBody ProductModel newPlant){
+    public ProductModel addNewPlant(@RequestBody ProductModel newPlant) {
         return productRepo.save(newPlant);
     }
 
@@ -69,7 +117,7 @@ public class ProductController {
     }
 
     @GetMapping("/getAllProduct")
-    public List<ProductModel> getAllProduct(){
+    public List<ProductModel> getAllProduct() {
         return plantService.findAllPlants();
     }
 
@@ -78,9 +126,7 @@ public class ProductController {
         try {
             if (productRepo.existsById(id)) {
                 productRepo.deleteById(id);
-                return new ResponseEntity<>(id+" Was Deleted", HttpStatus.OK);
-
-
+                return new ResponseEntity<>(id + " Was Deleted", HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("Plant not found", HttpStatus.NOT_FOUND);
             }
@@ -96,5 +142,16 @@ public class ProductController {
         return plantService.updatePlant(id, updatedPlant);
     }
 
-
+    @PutMapping("/setStandby/{id}")
+    public ResponseEntity<ProductModel> setPlantAsStandby(@PathVariable Long id) {
+        Optional<ProductModel> plantData = productRepo.findById(id);
+        if (plantData.isPresent()) {
+            ProductModel plant = plantData.get();
+            plant.setStatus("Standby");
+            productRepo.save(plant);
+            return new ResponseEntity<>(plant, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }

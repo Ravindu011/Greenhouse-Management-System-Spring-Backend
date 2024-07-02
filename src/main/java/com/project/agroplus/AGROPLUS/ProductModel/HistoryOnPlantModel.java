@@ -1,12 +1,15 @@
 package com.project.agroplus.AGROPLUS.ProductModel;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
 @Entity
 public class HistoryOnPlantModel {
 
     @Id
+    @GeneratedValue
+    private Long id;
     private Long PID;
 
     private String pName;
@@ -77,5 +80,13 @@ public class HistoryOnPlantModel {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
