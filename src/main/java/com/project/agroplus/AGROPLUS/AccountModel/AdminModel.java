@@ -1,4 +1,4 @@
-package com.project.agroplus.AGROPLUS.AdminModel;
+package com.project.agroplus.AGROPLUS.AccountModel;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
