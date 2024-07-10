@@ -1,6 +1,6 @@
-package com.project.agroplus.AGROPLUS.AdminRepository;
+package com.project.agroplus.AGROPLUS.AccountRepository;
 
-import com.project.agroplus.AGROPLUS.AdminModel.AdminModel;
+import com.project.agroplus.AGROPLUS.AccountModel.AdminModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AdminRepository extends JpaRepository<AdminModel, Long> {

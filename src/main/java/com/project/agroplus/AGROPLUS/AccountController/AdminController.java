@@ -1,7 +1,7 @@
-package com.project.agroplus.AGROPLUS.AdminController;
+package com.project.agroplus.AGROPLUS.AccountController;
 
-import com.project.agroplus.AGROPLUS.AdminModel.AdminModel;
-import com.project.agroplus.AGROPLUS.AdminRepository.AdminRepository;
+import com.project.agroplus.AGROPLUS.AccountModel.AdminModel;
+import com.project.agroplus.AGROPLUS.AccountRepository.AdminRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
