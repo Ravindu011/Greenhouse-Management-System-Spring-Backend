@@ -1,10 +1,12 @@
 package com.project.agroplus.AGROPLUS.ProductController;
 
 import com.project.agroplus.AGROPLUS.PlantService.PlantService;
+import com.project.agroplus.AGROPLUS.ProductModel.OnTempModel;
 import com.project.agroplus.AGROPLUS.ProductModel.ProductModel;
 import com.project.agroplus.AGROPLUS.ProductModel.OnPlantModel;
 import com.project.agroplus.AGROPLUS.ProductRepository.HistoryOnPlantRepo;
 import com.project.agroplus.AGROPLUS.ProductRepository.OnPlantRepo;
+import com.project.agroplus.AGROPLUS.ProductRepository.OnTempRepository;
 import com.project.agroplus.AGROPLUS.ProductRepository.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +32,119 @@ public class ProductController {
     public PlantService plantService;
 
 //    @PutMapping("/setOngoing/{id}")
+//    public ResponseEntity<String> setPlantAsOngoing(@PathVariable Long id) {
+//        Optional<ProductModel> plantData = productRepo.findById(id);
+//        if (plantData.isPresent()) {
+//            ProductModel plant = plantData.get();
+//            plant.setStatus("Ongoing");
+//
+//            List<OnPlantModel> ongoingPlants = onPlantRepo.findAll();
+//
+//            if (ongoingPlants.isEmpty()) {
+//                // Table is empty, add the plant
+//                onPlantRepo.save(new OnPlantModel(
+//                        plant.getPID(),
+//                        plant.getpName(),
+//                        plant.getTemp(),
+//                        plant.getHumidity(),
+//                        plant.getDaysToGrow(),
+//                        plant.getStatus()
+//                ));
+//                productRepo.save(plant);
+//                return new ResponseEntity<>("Plant added to ongoing table.", HttpStatus.OK);
+//            } else {
+//                // Table is not empty, check temperature and humidity of the first plant
+//                OnPlantModel firstOngoingPlant = ongoingPlants.get(0);
+//                if (firstOngoingPlant.getTemp()==(plant.getTemp()) &&
+//                        firstOngoingPlant.getHumidity()==(plant.getHumidity())) {
+//                    // Temperatures and humidities are equal, add the plant
+//                    onPlantRepo.save(new OnPlantModel(
+//                            plant.getPID(),
+//                            plant.getpName(),
+//                            plant.getTemp(),
+//                            plant.getHumidity(),
+//                            plant.getDaysToGrow(),
+//                            plant.getStatus()
+//                    ));
+//                    productRepo.save(plant);
+//                    return new ResponseEntity<>("Plant added to ongoing table.", HttpStatus.OK);
+//                } else {
+//                    // Temperatures and humidities are not equal, return error message
+//                    return new ResponseEntity<>("Error: Temperature and humidity do not match the ongoing plant conditions.", HttpStatus.CONFLICT);
+//                }
+//            }
+//        } else {
+//            return new ResponseEntity<>("Error: Plant not found.", HttpStatus.NOT_FOUND);
+//        }
+//    }
+
+
+
+
+    @PutMapping("/setOngoing/{id}")
+    public ResponseEntity<String> setPlantAsOngoing(@PathVariable Long id) {
+        Optional<ProductModel> plantData = productRepo.findById(id);
+        if (plantData.isPresent()) {
+            ProductModel plant = plantData.get();
+//            plant.setStatus("Ongoing");
+
+            // Save or update the OnTempModel with the temperature and humidity
+
+
+            List<OnPlantModel> ongoingPlants = onPlantRepo.findAll();
+
+            if (ongoingPlants.isEmpty()) {
+                plant.setStatus("Ongoing");
+                OnTempModel onTempModel = new OnTempModel(plant.getTemp(), plant.getHumidity(), plant.getPID());
+                onTempRepository.save(onTempModel);
+
+                // Table is empty, add the plant to the OnPlantModel
+                onPlantRepo.save(new OnPlantModel(
+                        plant.getPID(),
+                        plant.getpName(),
+                        plant.getTemp(),
+                        plant.getHumidity(),
+                        plant.getDaysToGrow(),
+                        plant.getStatus()
+                ));
+                productRepo.save(plant);
+                return new ResponseEntity<>("Plant added to ongoing table.", HttpStatus.OK);
+            } else {
+                // Table is not empty, check temperature and humidity of the first ongoing plant
+                OnPlantModel firstOngoingPlant = ongoingPlants.get(0);
+                if (firstOngoingPlant.getTemp() == plant.getTemp() &&
+                        firstOngoingPlant.getHumidity() == plant.getHumidity()) {
+                    plant.setStatus("Ongoing");
+                    OnTempModel onTempModel = new OnTempModel(plant.getTemp(), plant.getHumidity(), plant.getPID());
+                    onTempRepository.save(onTempModel);
+
+                    // Temperatures and humidities match, add the plant
+                    onPlantRepo.save(new OnPlantModel(
+                            plant.getPID(),
+                            plant.getpName(),
+                            plant.getTemp(),
+                            plant.getHumidity(),
+                            plant.getDaysToGrow(),
+                            plant.getStatus()
+                    ));
+                    productRepo.save(plant);
+                    return new ResponseEntity<>("Plant added to ongoing table.", HttpStatus.OK);
+                } else {
+                    // Temperatures and humidities do not match, return error message
+                    return new ResponseEntity<>("Error: Temperature and humidity do not match the ongoing plant conditions.", HttpStatus.CONFLICT);
+                }
+            }
+        } else {
+            return new ResponseEntity<>("Error: Plant not found.", HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+
+
+
+
+//    @PutMapping("/setOngoing/{id}")
 //    public ResponseEntity<ProductModel> setPlantAsOngoing(@PathVariable Long id) {
 //        Optional<ProductModel> plantData = productRepo.findById(id);
 //        if (plantData.isPresent()) {
@@ -53,52 +168,59 @@ public class ProductController {
 //        }
 //    }
 
-    @PutMapping("/setOngoing/{id}")
-    public ResponseEntity<String> setPlantAsOngoing(@PathVariable Long id) {
-        Optional<ProductModel> plantData = productRepo.findById(id);
-        if (plantData.isPresent()) {
-            ProductModel plant = plantData.get();
-            plant.setStatus("Ongoing");
+    @Autowired
+    private OnTempRepository onTempRepository;
 
-            List<OnPlantModel> ongoingPlants = onPlantRepo.findAll();
-
-            if (ongoingPlants.isEmpty()) {
-                // Table is empty, add the plant
-                onPlantRepo.save(new OnPlantModel(
-                        plant.getPID(),
-                        plant.getpName(),
-                        plant.getTemp(),
-                        plant.getHumidity(),
-                        plant.getDaysToGrow(),
-                        plant.getStatus()
-                ));
-                productRepo.save(plant);
-                return new ResponseEntity<>("Plant added to ongoing table.", HttpStatus.OK);
-            } else {
-                // Table is not empty, check temperature and humidity of the first plant
-                OnPlantModel firstOngoingPlant = ongoingPlants.get(0);
-                if (firstOngoingPlant.getTemp()==(plant.getTemp()) &&
-                        firstOngoingPlant.getHumidity()==(plant.getHumidity())) {
-                    // Temperatures and humidities are equal, add the plant
-                    onPlantRepo.save(new OnPlantModel(
-                            plant.getPID(),
-                            plant.getpName(),
-                            plant.getTemp(),
-                            plant.getHumidity(),
-                            plant.getDaysToGrow(),
-                            plant.getStatus()
-                    ));
-                    productRepo.save(plant);
-                    return new ResponseEntity<>("Plant added to ongoing table.", HttpStatus.OK);
-                } else {
-                    // Temperatures and humidities are not equal, return error message
-                    return new ResponseEntity<>("Error: Temperature and humidity do not match the ongoing plant conditions.", HttpStatus.CONFLICT);
-                }
-            }
-        } else {
-            return new ResponseEntity<>("Error: Plant not found.", HttpStatus.NOT_FOUND);
-        }
-    }
+//    @PutMapping("/setOngoing/{id}")
+//    public ResponseEntity<String> setPlantAsOngoing(@PathVariable Long id) {
+//        Optional<ProductModel> plantData = productRepo.findById(id);
+//        if (plantData.isPresent()) {
+//            ProductModel plant = plantData.get();
+//            plant.setStatus("Ongoing");
+//
+//            // Save temperature and humidity to OnTempModel table
+//            OnTempModel onTemp = new OnTempModel(plant.getTemp(), plant.getHumidity(),pl);
+//            onTempRepository.save(onTemp);
+//
+//            List<OnPlantModel> ongoingPlants = onPlantRepo.findAll();
+//
+//            if (ongoingPlants.isEmpty()) {
+//                // Table is empty, add the plant
+//                onPlantRepo.save(new OnPlantModel(
+//                        plant.getPID(),
+//                        plant.getpName(),
+//                        plant.getTemp(),
+//                        plant.getHumidity(),
+//                        plant.getDaysToGrow(),
+//                        plant.getStatus()
+//                ));
+//                productRepo.save(plant);
+//                return new ResponseEntity<>("Plant added to ongoing table.", HttpStatus.OK);
+//            } else {
+//                // Table is not empty, check temperature and humidity of the first plant
+//                OnPlantModel firstOngoingPlant = ongoingPlants.get(0);
+//                if (firstOngoingPlant.getTemp()==(plant.getTemp()) &&
+//                        firstOngoingPlant.getHumidity()==(plant.getHumidity())) {
+//                    // Temperatures and humidities are equal, add the plant
+//                    onPlantRepo.save(new OnPlantModel(
+//                            plant.getPID(),
+//                            plant.getpName(),
+//                            plant.getTemp(),
+//                            plant.getHumidity(),
+//                            plant.getDaysToGrow(),
+//                            plant.getStatus()
+//                    ));
+//                    productRepo.save(plant);
+//                    return new ResponseEntity<>("Plant added to ongoing table.", HttpStatus.OK);
+//                } else {
+//                    // Temperatures and humidities are not equal, return error message
+//                    return new ResponseEntity<>("Error: Temperature and humidity do not match the ongoing plant conditions.", HttpStatus.CONFLICT);
+//                }
+//            }
+//        } else {
+//            return new ResponseEntity<>("Error: Plant not found.", HttpStatus.NOT_FOUND);
+//        }
+//    }
 
 
     @PostMapping("/addNewPlant")
