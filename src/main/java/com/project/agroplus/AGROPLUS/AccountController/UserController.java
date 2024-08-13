@@ -20,12 +20,60 @@ public class UserController {
     }
 
     @PostMapping("/userlogin")
-    public String userLogin(@RequestBody UserModel userModel) {
+    public UserResponse userLogin(@RequestBody UserModel userModel) {
         UserModel existingUser = userRepository.findByEmailAndPassword(userModel.getEmail(), userModel.getPassword());
         if (existingUser != null) {
-            return "Successful User Login";
+            return new UserResponse("Welcome, " + existingUser.getUsername()); // Include the username in the response
         } else {
-            return "Invalid email or password";
+            return new UserResponse("Invalid email or password");
+        }
+    }
+
+
+    @PostMapping("/getUsername")
+    public UserResponse login(@RequestBody LoginRequest loginRequest) {
+        UserModel existingUser = userRepository.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
+        if (existingUser != null) {
+            return new UserResponse(existingUser.getUsername());
+        } else {
+            return new UserResponse("Invalid email or password");
+        }
+    }
+    public static class UserResponse {
+        private String User;
+
+        public UserResponse(String message) {
+            this.User = message;
+        }
+
+        public String getMessage() {
+            return User;
+        }
+
+        public void setMessage(String message) {
+            this.User = message;
+        }
+    }
+
+    // Request class for login
+    public static class LoginRequest {
+        private String email;
+        private String password;
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
         }
     }
 
