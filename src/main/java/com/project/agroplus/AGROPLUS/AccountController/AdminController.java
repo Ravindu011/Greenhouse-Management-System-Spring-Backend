@@ -1,6 +1,7 @@
 package com.project.agroplus.AGROPLUS.AccountController;
 
 import com.project.agroplus.AGROPLUS.AccountModel.AdminModel;
+import com.project.agroplus.AGROPLUS.AccountModel.UserModel;
 import com.project.agroplus.AGROPLUS.AccountRepository.AdminRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -20,12 +21,12 @@ public class AdminController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody AdminModel adminModel) {
+    public UserController.UserResponse userLogin(@RequestBody AdminModel adminModel) {
         AdminModel existingUser = adminRepository.findByEmailAndPassword(adminModel.getEmail(), adminModel.getPassword());
         if (existingUser != null) {
-            return "Successful login";
+            return new UserController.UserResponse("Welcome, " + existingUser.getUsername()); // Include the username in the response
         } else {
-            return "Invalid email or password";
+            return new UserController.UserResponse("Invalid email or password");
         }
     }
 
